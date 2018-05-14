@@ -3,20 +3,33 @@ from torch import nn
 
 
 class NTMController(nn.Module):
-    def __init__(self, input_size, output_size, weighting_size):
+    def __init__(self, input_size, output_size, state_size, key_size):
         super().__init__()
-        self.net = nn.LSTMCell(input_size, weighting_size)
+        self.input_size = input_size
+        self.output_size = output_size
+        self.state_size = state_size
+        self.key_size = key_size
 
-        # key is long term state (c) and output is short term state (h)
-        # key is used as a query vector by heads for attention
-        self.key = torch.Tensor(1, weighting_size)
-        self.output = torch.Tensor(1, output_size)
+        self.controller_net = nn.LSTMCell(input_size, state_size)
+
+        # fc layer transforming long-term state (c) to key vector for heads input
+        self.key_fc = nn.Linear(state_size, key_size)
+
+        # fc layer transforming short-term state (h) to output vector
+        self.out_fc = nn.Linear(state_size, output_size)
+
+        self.h_state = torch.Tensor(1, state_size)
+        self.c_state = torch.Tensor(1, state_size)
         self.reset()
 
     def forward(self, x):
-        self.output, self.key = self.net(x, (self.output, self.key))
-        return self.output.squeeze(0), self.key.squeeze(0)
+        self.h_state, self.c_state = self.controller_net(x, (self.h_state, self.c_state))
+        output = self.out_fc(self.h_state)
+        key = self.key_fc(self.c_state)
+        return output, key
 
-    def reset(self):
-        nn.init.kaiming_uniform_(self.key)
-        nn.init.kaiming_uniform_(self.output)
+    def reset(self, batch_size=1):
+        self.h_state = torch.Tensor(batch_size, self.state_size)
+        self.c_state = torch.Tensor(batch_size, self.state_size)
+        nn.init.kaiming_uniform_(self.h_state)
+        nn.init.kaiming_uniform_(self.c_state)

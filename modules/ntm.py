@@ -14,7 +14,9 @@ class NTM(nn.Module):
                  memory_unit_size,
                  num_heads):
         super().__init__()
-        self.controller = NTMController(input_size, output_size, controller_size)
+        self.controller = NTMController(input_size, output_size,
+                                        state_size=controller_size,
+                                        key_size=memory_unit_size)
         self.memory = NTMMemory(memory_units, memory_unit_size)
         self.heads = []
         for head in range(num_heads):
