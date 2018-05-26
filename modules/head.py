@@ -8,15 +8,27 @@ class NTMHead(nn.Module):
         super().__init__()
         self.mode = mode
 
-    def forward(self, prev_weights, memory, controller_outputs):
+    def forward(self, data, prev_weights, memory, controller_outputs):
         """Accept previous state (weights and memory) and controller outputs,
         produce attention weights for current read or write operation.
         Weights are produced by content-based and location-based addressing.
 
         Refer *Figure 2* in the paper to see how weights are produced.
 
+        The head returns current weights useful for next time step, while
+        it reads from or writes to ``memory`` based on its mode, using the
+        ``data`` vector. ``data`` is filled in-place and not returned
+        for read mode.
+
+        Refer *Section 3.1* for read mode and *Section 3.2* for write mode.
+
         Parameters
         ----------
+        data : torch.Tensor
+            Depending upon the mode, this data vector will be filled 
+            in-place (read) or written to memory (write).
+            ``(batch_size, memory_unit_size)``
+
         prev_weights : torch.Tensor
             Attention weights from previous time step.
             ``(batch_size, memory_units)``
@@ -49,6 +61,8 @@ class NTMHead(nn.Module):
         gamma = controller_outputs['sharpen_factor']
         sharpened_weights = shifted_weights ** gamma
         current_weights = F.softmax(sharpened_weights)
+
+        # todo: perform read or write operations
         return current_weights
 
     @staticmethod

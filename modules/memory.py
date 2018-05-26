@@ -45,10 +45,58 @@ class NTMMemory(nn.Module):
         # view key with three dimensions as memory, add dummy dimension
         key = key.view(-1, 1, self.m)
 
-        # calculate similarity along last dimension (memory_unit_size)
+        # calculate similarity along last dimension (self.m)
         similarity = F.cosine_similarity(key, self.memory, dim=-1)
         content_weights = F.softmax(key_strength * similarity, dim=1)
         return content_weights
+
+    def read(self, weights):
+        """Read from memory through soft attention over all locations.
+
+        Refer *Section 3.1* in the paper for read mechanism.
+
+        Parameters
+        ----------
+        weights : torch.Tensor
+            Attention weights emitted by a read head.
+            ``(batch_size, memory_units)``
+
+        Returns
+        -------
+        data : torch.Tensor
+            Data read from memory weighted by attention.
+            ``(batch_size, memory_unit_size)``
+        """
+        # expand and perform batch matrix mutliplication
+        weights = weights.view(-1, 1, self.m)
+        # (b, 1, self.n) x (b, self.n, self.m) -> (b, 1, self.m)
+        data = torch.bmm(weights, self.memory).squeeze()
+        return data
+
+    def write(self, weights, data):
+        """Write to memory through soft attention over all locations.
+
+        Refer *Section 3.2* in the paper for write mechanism.
+
+        .. note::
+            Erase and add mechanisms have been merged here.
+            ``weights(erase) = (1 - weights(add))``
+
+        Parameters
+        ----------
+        weights : torch.Tensor
+            Attention weights emitted by a write head.
+            ``(batch_size, memory_units)``
+
+        data : torch.Tensor
+            Data to be written to memory.
+            ``(batch_size, memory_unit_size)``
+        """
+
+        # make weights and write_data sizes same as memory
+        weights = weights.view(-1, self.n, 1).expand(self.memory.size())
+        data = data.view(-1, 1, self.m).expand(self.memory.size())
+        self.memory = weights * write_data + (1 - weights) * self.memory
 
     def reset(self, batch_size=1):
         self.memory = torch.Tensor(batch_size, self.n, self.m)
