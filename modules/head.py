@@ -17,16 +17,15 @@ class NTMHead(nn.Module):
 
         The head returns current weights useful for next time step, while
         it reads from or writes to ``memory`` based on its mode, using the
-        ``data`` vector. ``data`` is filled in-place and not returned
-        for read mode.
+        ``data`` vector. ``data`` is filled and returned for read mode, 
+        returned as is for write mode.
 
         Refer *Section 3.1* for read mode and *Section 3.2* for write mode.
 
         Parameters
         ----------
         data : torch.Tensor
-            Depending upon the mode, this data vector will be filled 
-            in-place (read) or written to memory (write).
+            Depending upon the mode, this data vector will be used by memory.
             ``(batch_size, memory_unit_size)``
 
         prev_weights : torch.Tensor
@@ -47,6 +46,10 @@ class NTMHead(nn.Module):
             Produced by the content-based and location-based (interpolate, 
             shift, sharpen) addressing mechanisms.
             ``(batch_size, memory_units)``
+
+        data : torch.Tensor
+            Data which was provided as input, will be filled if in read mode.
+            ``(batch_size, memory_unit_size)``
         """
 
         content_weights = memory.content_addressing(
@@ -62,8 +65,13 @@ class NTMHead(nn.Module):
         sharpened_weights = shifted_weights ** gamma
         current_weights = F.softmax(sharpened_weights)
 
-        # todo: perform read or write operations
-        return current_weights
+        if self.mode == 'r':
+            data = memory.read(current_weights)
+        elif self.mode == 'w':
+            memory.write(current_weights, data)
+        else:
+            raise ValueError("mode must be read ('r') or write('w')")
+        return current_weights, data
 
     @staticmethod
     def _circular_conv1d(in_tensor, weights):
