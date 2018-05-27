@@ -28,7 +28,7 @@ class NTMHead(nn.Module):
 
         The head returns current weights useful for next time step, while
         it reads from or writes to ``memory`` based on its mode, using the
-        ``data`` vector. ``data`` is filled and returned for read mode, 
+        ``data`` vector. ``data`` is filled and returned for read mode,
         returned as is for write mode.
 
         Refer *Section 3.1* for read mode and *Section 3.2* for write mode.
@@ -40,27 +40,21 @@ class NTMHead(nn.Module):
             ``(batch_size, memory_unit_size)``
 
         controller_state : torch.Tensor
-            Long-term state returned by `NTMController.forward`.
-            ``(batch_size, controller_size)
+            Long-term state of the controller.
+            ``(batch_size, controller_size)``
 
         prev_weights : torch.Tensor
             Attention weights from previous time step.
             ``(batch_size, memory_units)``
 
-        memory : NTMMemory
-            An instance of `NTMMemory` containing the memory tensor.
-            Read and write operations will be performed in place.
+        memory : ntm_modules.NTMMemory
+            Memory Instance. Read write operations will be performed in place.
 
         Returns
         -------
-        current_weights : torch.Tensor
-            Produced by the content-based and location-based (interpolate, 
-            shift, sharpen) addressing mechanisms.
-            ``(batch_size, memory_units)``
-
-        data : torch.Tensor
-            Data which was provided as input, will be filled if in read mode.
-            ``(batch_size, memory_unit_size)``
+        current_weights, data : torch.Tensor, torch.Tensor
+            Current weights and data (filled in read operation else as it is).
+            ``(batch_size, memory_units), (batch_size, memory_unit_size)``
         """
 
         # all these are marked as "controller outputs" in Figure 2
@@ -74,7 +68,7 @@ class NTMHead(nn.Module):
 
         # location-based addressing - interpolate, shift, sharpen
         interpolated_weights = g * content_weights + (1 - g) * prev_weights
-        shifted_weights = _circular_conv1d(interpolated_weights, s)
+        shifted_weights = self._circular_conv1d(interpolated_weights, s)
         current_weights = F.softmax(shifted_weights ** y)
 
         if self.mode == 'r':

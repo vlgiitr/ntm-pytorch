@@ -1,8 +1,8 @@
 from torch import nn
 
-from .controller import NTMController
-from .head import NTMHead
-from .memory import NTMMemory
+from ntm_modules.controller import NTMController
+from ntm_modules.head import NTMHead
+from ntm_modules.memory import NTMMemory
 
 
 class NTM(nn.Module):
@@ -31,5 +31,5 @@ class NTM(nn.Module):
         cls.heads = heads
         return cls
 
-    def forward(self, *inputs):
+    def forward(self, in_data):
         pass

@@ -18,8 +18,8 @@ class NTMController(nn.Module):
         self.c_state = torch.Tensor(1, state_size)
         self.reset()
 
-    def forward(self, x):
-        self.h_state, self.c_state = self.controller_net(x, (self.h_state, self.c_state))
+    def forward(self, in_data):
+        self.h_state, self.c_state = self.controller_net(in_data, (self.h_state, self.c_state))
         output = self.out_fc(self.h_state)
         return output, self.c_state
 

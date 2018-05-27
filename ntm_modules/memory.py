@@ -96,7 +96,7 @@ class NTMMemory(nn.Module):
         # make weights and write_data sizes same as memory
         weights = weights.view(-1, self.n, 1).expand(self.memory.size())
         data = data.view(-1, 1, self.m).expand(self.memory.size())
-        self.memory = weights * write_data + (1 - weights) * self.memory
+        self.memory = weights * data + (1 - weights) * self.memory
 
     def reset(self, batch_size=1):
         self.memory = torch.Tensor(batch_size, self.n, self.m)
