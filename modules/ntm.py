@@ -15,12 +15,14 @@ class NTM(nn.Module):
                  num_heads):
         super().__init__()
         self.controller = NTMController(input_size, output_size,
-                                        state_size=controller_size,
-                                        key_size=memory_unit_size)
+                                        state_size=controller_size)
         self.memory = NTMMemory(memory_units, memory_unit_size)
         self.heads = []
         for head in range(num_heads):
-            self.heads += [NTMHead('r'), NTMHead('w')]
+            self.heads += [
+                NTMHead('r', controller_size, key_size=memory_unit_size),
+                NTMHead('w', controller_size, key_size=memory_unit_size)
+            ]
 
     @classmethod
     def init_from_modules(cls, controller, memory, heads):

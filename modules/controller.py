@@ -3,17 +3,13 @@ from torch import nn
 
 
 class NTMController(nn.Module):
-    def __init__(self, input_size, output_size, state_size, key_size):
+    def __init__(self, input_size, output_size, state_size):
         super().__init__()
         self.input_size = input_size
         self.output_size = output_size
         self.state_size = state_size
-        self.key_size = key_size
 
         self.controller_net = nn.LSTMCell(input_size, state_size)
-
-        # fc layer transforming long-term state (c) to key vector for heads input
-        self.key_fc = nn.Linear(state_size, key_size)
 
         # fc layer transforming short-term state (h) to output vector
         self.out_fc = nn.Linear(state_size, output_size)
@@ -25,8 +21,7 @@ class NTMController(nn.Module):
     def forward(self, x):
         self.h_state, self.c_state = self.controller_net(x, (self.h_state, self.c_state))
         output = self.out_fc(self.h_state)
-        key = self.key_fc(self.c_state)
-        return output, key
+        return output, self.c_state
 
     def reset(self, batch_size=1):
         self.h_state = torch.Tensor(batch_size, self.state_size)

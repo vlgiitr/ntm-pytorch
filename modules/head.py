@@ -4,12 +4,23 @@ from torch import nn
 
 
 class NTMHead(nn.Module):
-    def __init__(self, mode):
+    def __init__(self, mode, controller_size, key_size):
         super().__init__()
         self.mode = mode
+        self.key_size = key_size
 
-    def forward(self, data, prev_weights, memory, controller_outputs):
-        """Accept previous state (weights and memory) and controller outputs,
+        # all the fc layers to produce scalars for memory addressing
+        self.key_fc = nn.Linear(controller_size, key_size)
+        self.key_strength_fc = nn.Linear(controller_size, 1)
+
+        # these five fc layers cannot be in controller class
+        # since each head has its own parameters and scalars
+        self.interpolation_gate_fc = nn.Linear(controller_size, 1)
+        self.shift_weighting_fc = nn.Linear(controller_size, 3)
+        self.sharpen_factor_fc = nn.Linear(controller_size, 1)
+
+    def forward(self, data, controller_state, prev_weights, memory):
+        """Accept previous state (weights and memory) and controller state,
         produce attention weights for current read or write operation.
         Weights are produced by content-based and location-based addressing.
 
@@ -28,17 +39,17 @@ class NTMHead(nn.Module):
             Depending upon the mode, this data vector will be used by memory.
             ``(batch_size, memory_unit_size)``
 
+        controller_state : torch.Tensor
+            Long-term state returned by `NTMController.forward`.
+            ``(batch_size, controller_size)
+
         prev_weights : torch.Tensor
             Attention weights from previous time step.
             ``(batch_size, memory_units)``
 
-        memory : torch.Tensor
+        memory : NTMMemory
             An instance of `NTMMemory` containing the memory tensor.
             Read and write operations will be performed in place.
-
-        controller_outputs : dict
-            A dict returned by `NTMController.forward` method, contents of
-            this dict are mentioned in *Figure 2*.
 
         Returns
         -------
@@ -52,18 +63,19 @@ class NTMHead(nn.Module):
             ``(batch_size, memory_unit_size)``
         """
 
-        content_weights = memory.content_addressing(
-            controller_outputs['key'], controller_outputs['key_strength'])
+        # all these are marked as "controller outputs" in Figure 2
+        key = self.key_fc(controller_state)
+        b = self.key_strength_fc(controller_state)
+        g = self.interpolation_gate_fc(controller_state)
+        s = self.shift_weighting_fc(controller_state)
+        y = self.sharpen_factor_fc(controller_state)
 
-        g = controller_outputs['interpolation_gate']
+        content_weights = memory.content_addressing(key, b)
+
+        # location-based addressing - interpolate, shift, sharpen
         interpolated_weights = g * content_weights + (1 - g) * prev_weights
-
-        s = controller_outputs['shift_weighting']
         shifted_weights = _circular_conv1d(interpolated_weights, s)
-
-        gamma = controller_outputs['sharpen_factor']
-        sharpened_weights = shifted_weights ** gamma
-        current_weights = F.softmax(sharpened_weights)
+        current_weights = F.softmax(shifted_weights ** y)
 
         if self.mode == 'r':
             data = memory.read(current_weights)
