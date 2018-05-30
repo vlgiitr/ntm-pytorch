@@ -68,7 +68,7 @@ class NTMMemory(nn.Module):
             ``(batch_size, memory_unit_size)``
         """
         # expand and perform batch matrix mutliplication
-        weights = weights.view(-1, 1, self.m)
+        weights = weights.view(-1, 1, self.n)
         # (b, 1, self.n) x (b, self.n, self.m) -> (b, 1, self.m)
         data = torch.bmm(weights, self.memory).squeeze()
         return data
