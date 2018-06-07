@@ -18,8 +18,10 @@ class NTMHead(nn.Module):
         self.interpolation_gate_fc = nn.Linear(controller_size, 1)
         self.shift_weighting_fc = nn.Linear(controller_size, 3)
         self.sharpen_factor_fc = nn.Linear(controller_size, 1)
+        # fc layer to produce write data. data vector length=key_size
+        self.write_data_fc = nn.Linear(controller_size, key_size)
 
-    def forward(self, data, controller_state, prev_weights, memory):
+    def forward(self, controller_state, prev_weights, memory, data=None):
         """Accept previous state (weights and memory) and controller state,
         produce attention weights for current read or write operation.
         Weights are produced by content-based and location-based addressing.
@@ -35,10 +37,6 @@ class NTMHead(nn.Module):
 
         Parameters
         ----------
-        data : torch.Tensor
-            Depending upon the mode, this data vector will be used by memory.
-            ``(batch_size, memory_unit_size)``
-
         controller_state : torch.Tensor
             Long-term state of the controller.
             ``(batch_size, controller_size)``
@@ -49,6 +47,10 @@ class NTMHead(nn.Module):
 
         memory : ntm_modules.NTMMemory
             Memory Instance. Read write operations will be performed in place.
+            
+        data : torch.Tensor
+            Depending upon the mode, this data vector will be used by memory.
+            ``(batch_size, memory_unit_size)``       
 
         Returns
         -------
@@ -63,6 +65,7 @@ class NTMHead(nn.Module):
         g = self.interpolation_gate_fc(controller_state)
         s = self.shift_weighting_fc(controller_state)
         y = self.sharpen_factor_fc(controller_state)
+        a = self.write_data_fc(controller_state)  # add vector
 
         content_weights = memory.content_addressing(key, b)
 
