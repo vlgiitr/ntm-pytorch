@@ -1,9 +1,9 @@
-Neural Turning Machines (Pytorch)
+Neural Turing Machines (Pytorch)
 =================================
 
 Code for the Paper
 
-**[Neural Turning Machines][1]**
+**[Neural Turing Machines][1]**
 Alex Graves, Greg Wayne, Ivo Danihelka
 
 
