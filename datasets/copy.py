@@ -37,7 +37,7 @@ class CopyDataset(Dataset):
     def __getitem__(self, idx):
         # idx only acts as a counter while generating batches.
         seq_len = torch.randint(
-            self.min_seq_len, self.max_seq_len, (1,), dtype=torch.long)
+            self.min_seq_len, self.max_seq_len, (1,), dtype=torch.long).item()
         prob = 0.5 * torch.ones([seq_len, self.seq_width], dtype=torch.float64)
         seq = Binomial(1, prob).sample()
 
