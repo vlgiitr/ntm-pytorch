@@ -40,8 +40,8 @@ class RepeatCopyDataset(Dataset):
         self.max_repeat = max_repeat
 
     def normalise(self, rep):
-        rep_mean = (self.max_repeat - self.min_repeat)/2
-        rep_var = (((self.max_repeat - self.repeat_min + 1) ** 2)-1)/12
+        rep_mean = (self.max_repeat - self.min_repeat) / 2
+        rep_var = (((self.max_repeat - self.repeat_min + 1) ** 2) - 1) / 12
         rep_std = torch.sqrt(rep_var)
         return (rep-rep_mean)/rep_std
 
