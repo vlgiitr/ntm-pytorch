@@ -3,7 +3,7 @@ from torch import nn
 
 
 class NTMController(nn.Module):
-    def __init__(self, input_size, state_size, output_size, read_data_size, output_size):
+    def __init__(self, input_size, state_size, output_size, read_data_size):
         super().__init__()
         self.input_size = input_size
         self.state_size = state_size
