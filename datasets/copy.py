@@ -13,21 +13,17 @@ class CopyDataset(Dataset):
     width is one more than the target sequence.
     """
 
-    def __init__(self, seq_width=8, min_seq_len=1, max_seq_len=20):
+    def __init__(self, task_params):
         """Initialize a dataset instance for copy task.
 
         Arguments
         ---------
-        seq_width : int, optional
-            Width of the target sequence.
-        min_seq_len : int, optional
-            Minimum length of the target sequence.
-        max_seq_len : int, optional
-            Maximum length of the target sequence.
+        task_params : dict
+            A dict containing parameters relevant to copy task.
         """
-        self.seq_width = seq_width
-        self.min_seq_len = min_seq_len
-        self.max_seq_len = max_seq_len
+        self.seq_width = task_params['seq_width']
+        self.min_seq_len = task_params['min_seq_len']
+        self.max_seq_len = task_params['max_seq_len']
 
     def __len__(self):
         # sequences are generated randomly so this does not matter
