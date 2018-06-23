@@ -17,6 +17,6 @@ def get_parser():
                         help='momentum for rmsprop optimizer')
     parser.add_argument('-alpha', default=0.95,
                         help='alpha for rmsprop optimizer')
-    parser.add_argument('-betas',default=[0.9,0,999],
+    parser.add_argument('-betas',default=[0.9,0.999],
                         help='betas for Adam optimizer')
     return parser
