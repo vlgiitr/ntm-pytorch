@@ -12,9 +12,11 @@ def get_parser():
 
     # todo: only rmsprop optimizer supported yet, support adam too
     parser.add_argument('-lr', default=1e-4,
-                        help='learning rate for rmsprop optimizer')
+                        help='learning rate for rmsprop or Adam optimizer')
     parser.add_argument('-momentum', default=0.9,
                         help='momentum for rmsprop optimizer')
     parser.add_argument('-alpha', default=0.95,
                         help='alpha for rmsprop optimizer')
+    parser.add_argument('-betas',default=[0.9,0,999],
+                        help='betas for Adam optimizer')
     return parser
