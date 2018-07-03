@@ -7,10 +7,11 @@ from .modules.memory import NTMMemory
 
 
 class NTM(nn.Module):
-    # TODO: To check output of the NTMClass. What all is needed as output. 
-    # For the next time-step although we need prev_states but drawing analogy 
-    # with the LSTMCell where we were updating h_state and c_state on the fly, 
+    # TODO: To check output of the NTMClass. What all is needed as output.
+    # For the next time-step although we need prev_states but drawing analogy
+    # with the LSTMCell where we were updating h_state and c_state on the fly,
     # have tried to do something similar here. To check whether it's correct.
+
     def __init__(self,
                  input_size,
                  output_size,
@@ -44,7 +45,10 @@ class NTM(nn.Module):
             prev_weight = torch.zeros(batch_size, self.memory.n)
             self.prev_head_weights.append(prev_weight)
         self.prev_reads = []
-        # TODO:initialize prev_reads for resetting.
+        # initialized prev_reads
+        for i in range(self.num_heads):
+            prev_read = torch.zeros([batch_size, self.memory.m])
+            self.prev_reads.append(prev_read)
 
     def forward(self, in_data):
         controller_h_state, controller_c_state = self.controller(
@@ -57,13 +61,13 @@ class NTM(nn.Module):
                     controller_c_state, prev_head_weight, self.memory)
                 read_data.append(r)
             else:
-                head_weight = head(
+                head_weight, _ = head(
                     controller_c_state, prev_head_weight, self.memory)
             head_weights.append(head_weight)
 
         output = self.controller.output(read_data)
 
-        self.prev_head_weights = head_weights.clone()
-        self.prev_reads = read_data.clone()
+        self.prev_head_weights = head_weights
+        self.prev_reads = read_data
 
         return output

@@ -17,13 +17,13 @@ class NTMController(nn.Module):
         self.reset()
 
     def forward(self, in_data, prev_reads):
-        x = torch.cat([in_data]+prev_reads, dim=1)
+        x = torch.cat([in_data]+prev_reads, dim=-1)
         self.h_state, self.c_state = self.controller_net(
             x, (self.h_state, self.c_state))
         return self.h_state, self.c_state
 
-    def output(self,read_data):
-        complete_state = torch.cat([self.h_state] + read_data, dim=1)
+    def output(self, read_data):
+        complete_state = torch.cat([self.h_state] + read_data, dim=-1)
         output = self.out_net(complete_state)
         return output
 

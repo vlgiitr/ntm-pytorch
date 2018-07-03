@@ -4,6 +4,7 @@ from torch import nn
 
 
 class NTMHead(nn.Module):
+
     def __init__(self, mode, controller_size, key_size):
         super().__init__()
         self.mode = mode
@@ -47,10 +48,10 @@ class NTMHead(nn.Module):
 
         memory : ntm_modules.NTMMemory
             Memory Instance. Read write operations will be performed in place.
-            
+
         data : torch.Tensor
             Depending upon the mode, this data vector will be used by memory.
-            ``(batch_size, memory_unit_size)``       
+            ``(batch_size, memory_unit_size)``
 
         Returns
         -------
@@ -64,7 +65,8 @@ class NTMHead(nn.Module):
         b = self.key_strength_fc(controller_state)
         g = self.interpolation_gate_fc(controller_state)
         s = self.shift_weighting_fc(controller_state)
-        y = self.sharpen_factor_fc(controller_state)
+        # added 1 as y should be >=1 but the output of the network was <1.
+        y = 1 + self.sharpen_factor_fc(controller_state)
         a = self.write_data_fc(controller_state)  # add vector
 
         content_weights = memory.content_addressing(key, b)
@@ -77,7 +79,8 @@ class NTMHead(nn.Module):
         if self.mode == 'r':
             data = memory.read(current_weights)
         elif self.mode == 'w':
-            memory.write(current_weights, data)
+            # replaced data by a as argument
+            memory.write(current_weights, a)
         else:
             raise ValueError("mode must be read ('r') or write('w')")
         return current_weights, data
@@ -87,7 +90,9 @@ class NTMHead(nn.Module):
         # pad left with elements from right, and vice-versa
         batch_size = weights.size(0)
         pad = int((weights.size(1) - 1) / 2)
-        in_tensor = torch.cat([in_tensor[-pad:], in_tensor, in_tensor[pad:]])
+        # changes in index slicing for consistency in dimensions
+        in_tensor = torch.cat(
+            [in_tensor[:, -pad:], in_tensor, in_tensor[:, :pad]], dim=1)
         out_tensor = F.conv1d(in_tensor.view(batch_size, 1, -1),
                               weights.view(batch_size, 1, -1))
         out_tensor = out_tensor.view(batch_size, -1)
