@@ -12,8 +12,8 @@ class NTMController(nn.Module):
 
         self.controller_net = nn.LSTMCell(input_size, state_size)
         self.out_net = nn.Linear(read_data_size, output_size)
-        self.h_state = torch.Tensor(1, state_size)
-        self.c_state = torch.Tensor(1, state_size)
+        self.h_state = torch.zeros([1, state_size])
+        self.c_state = torch.zeros([1, state_size])
         self.reset()
 
     def forward(self, in_data, prev_reads):
@@ -28,7 +28,7 @@ class NTMController(nn.Module):
         return output
 
     def reset(self, batch_size=1):
-        self.h_state = torch.Tensor(batch_size, self.state_size)
-        self.c_state = torch.Tensor(batch_size, self.state_size)
+        self.h_state = torch.zeros([batch_size, self.state_size])
+        self.c_state = torch.zeros([batch_size, self.state_size])
         nn.init.kaiming_uniform_(self.h_state)
         nn.init.kaiming_uniform_(self.c_state)

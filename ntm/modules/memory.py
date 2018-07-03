@@ -8,7 +8,7 @@ class NTMMemory(nn.Module):
         super().__init__()
         self.n = memory_units
         self.m = memory_unit_size
-        self.memory = torch.Tensor(1, self.n, self.m)
+        self.memory = torch.zeros([1, self.n, self.m])
         self.reset()
 
     def forward(self, *inputs):
@@ -70,8 +70,8 @@ class NTMMemory(nn.Module):
         # expand and perform batch matrix mutliplication
         weights = weights.view(-1, 1, self.n)
         # (b, 1, self.n) x (b, self.n, self.m) -> (b, 1, self.m)
-        # changed .squeeze to .view to consider cases where batch_size might
-        # one as it was giving error.
+        # changing .squeeze to .view to consider cases where batch_size might
+        # be one.
         data = torch.bmm(weights, self.memory).view(-1, self.m)
         return data
 
@@ -101,5 +101,5 @@ class NTMMemory(nn.Module):
         self.memory = weights * data + (1 - weights) * self.memory
 
     def reset(self, batch_size=1):
-        self.memory = torch.Tensor(batch_size, self.n, self.m)
+        self.memory = torch.zeros([batch_size, self.n, self.m])
         nn.init.kaiming_uniform_(self.memory)

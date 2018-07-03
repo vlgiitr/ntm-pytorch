@@ -1,4 +1,4 @@
-2import torch
+import torch
 from torch.utils.data import Dataset
 from torch.distributions.binomial import Binomial
 
@@ -6,11 +6,11 @@ from torch.distributions.binomial import Binomial
 class CopyDataset(Dataset):
     """A Dataset class to generate random examples for the copy task. Each
     sequence has a random length between `min_seq_len` and `max_seq_len`.
-    Each vector in the sequence has a fixed length of `seq_width`. The last
-    vector is a delimeter flag denoting end of sequence.
+    Each vector in the sequence has a fixed length of `seq_width`. The vectors
+    are bounded by start and end delimiter flags.
 
-    To account for the delimiter flag, the input sequence length as well
-    width is one more than the target sequence.
+    To account for the delimiter flags, the input sequence length as well
+    width is two more than the target sequence.
     """
 
     def __init__(self, task_params):
@@ -37,11 +37,11 @@ class CopyDataset(Dataset):
         prob = 0.5 * torch.ones([seq_len, self.seq_width], dtype=torch.float64)
         seq = Binomial(1, prob).sample()
 
-        # fill in input sequence, one bit longer and wider than target
+        # fill in input sequence, two bit longer and wider than target
         # it is zero-padded upto maximum length after delimiter
         input_seq = torch.zeros([self.max_seq_len + 2, self.seq_width + 2])
         input_seq[0, self.seq_width] = 1.0  # start delimiter
-        input_seq[1:seq_len, :self.seq_width] = seq
+        input_seq[1:seq_len + 1, :self.seq_width] = seq
         input_seq[seq_len + 1, self.seq_width + 1] = 1.0  # end delimiter
 
         # fill in and zero pad target sequence similarly

@@ -65,21 +65,29 @@ class NTMHead(nn.Module):
         b = self.key_strength_fc(controller_state)
         g = self.interpolation_gate_fc(controller_state)
         s = self.shift_weighting_fc(controller_state)
-        # added 1 as y should be >=1 but the output of the network was <1.
+        # here the sharpening factor is less than 1 whereas as required in the
+        # paper it should be greater than 1. hence adding 1.
         y = 1 + self.sharpen_factor_fc(controller_state)
         a = self.write_data_fc(controller_state)  # add vector
 
         content_weights = memory.content_addressing(key, b)
-
+        # print(content_weights)
         # location-based addressing - interpolate, shift, sharpen
         interpolated_weights = g * content_weights + (1 - g) * prev_weights
         shifted_weights = self._circular_conv1d(interpolated_weights, s)
+        # the softmax introduces the exp of the argument which isn't there in
+        # the paper. there it's just a simple normalization of the arguments.
+        # current_weights = shifted_weights ** y
+        print(shifted_weights)
         current_weights = F.softmax(shifted_weights ** y)
+        print(current_weights)
+        # current_weights = torch.div(current_weights, torch.sum(
+        #     current_weights, dim=1).view(-1, 1) + 1e-16)
+        # print(current_weights)
 
         if self.mode == 'r':
             data = memory.read(current_weights)
         elif self.mode == 'w':
-            # replaced data by a as argument
             memory.write(current_weights, a)
         else:
             raise ValueError("mode must be read ('r') or write('w')")
@@ -90,7 +98,8 @@ class NTMHead(nn.Module):
         # pad left with elements from right, and vice-versa
         batch_size = weights.size(0)
         pad = int((weights.size(1) - 1) / 2)
-        # changes in index slicing for consistency in dimensions
+        # changed [pad:] to [:pad] and dimension of concatnation. earlier
+        # we had forgotten batch_size i.e. 0 dimension
         in_tensor = torch.cat(
             [in_tensor[:, -pad:], in_tensor, in_tensor[:, :pad]], dim=1)
         out_tensor = F.conv1d(in_tensor.view(batch_size, 1, -1),
