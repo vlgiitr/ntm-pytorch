@@ -9,11 +9,11 @@ class RepeatCopyDataset(Dataset):
     Each vector in the sequence has a fixed length of `seq_width`. The last
     vector is a delimeter flag denoting end of sequence.
 
-    Along with a delimiter flag, the input sequence also contains a channel 
-    for number of repetitions. The input representing the repeat number is 
+    Along with a delimiter flag, the input sequence also contains a channel
+    for number of repetitions. The input representing the repeat number is
     normalised to have mean zero and variance one.
 
-    For the target sequence, each sequence is repeated given number of times 
+    For the target sequence, each sequence is repeated given number of times
     followed by a delimiter flag.
     """
 
@@ -43,7 +43,7 @@ class RepeatCopyDataset(Dataset):
         rep_mean = (self.max_repeat - self.min_repeat) / 2
         rep_var = (((self.max_repeat - self.repeat_min + 1) ** 2) - 1) / 12
         rep_std = torch.sqrt(rep_var)
-        return (rep-rep_mean)/rep_std
+        return (rep - rep_mean) / rep_std
 
     def __len__(self):
         # sequences are generated randomly so this does not matter
@@ -61,7 +61,7 @@ class RepeatCopyDataset(Dataset):
 
         # fill in input sequence, one bit longer and wider than target
         # it is zero-padded upto maximum length after delimiter
-        input_seq = torch.zeros([self.max_seq_len + 2, self.seq_width + 2])
+        input_seq = torch.zeros([self.seq_len + 2, self.seq_width + 2])
         input_seq[:seq_len, :self.seq_width] = seq
         input_seq[seq_len, self.seq_width] = 1.0  # delimiter
         input_seq[seq_len + 1, self.seq_width + 1] = self.normalise(rep)
@@ -69,8 +69,8 @@ class RepeatCopyDataset(Dataset):
         # Fill in similarly and zero-pad upto maximum possible length for
         # target sequence(max_seq_len*max_repeat) after delimiter.
         target_seq = torch.zeros(
-            [self.max_seq_len * self.max_repeat + 1, self.seq_width + 1])
+            [self.seq_len * self.rep + 1, self.seq_width + 1])
         target_seq[:seq_len * rep, :self.seq_width] = seq.repeat(rep, 1)
-        target_seq[seq_len*rep, self.seq_width] = 1.0  # delimiter
+        target_seq[seq_len * rep, self.seq_width] = 1.0  # delimiter
 
         return {'input': input_seq, 'target': target_seq}

@@ -51,6 +51,7 @@ class NTM(nn.Module):
         # TODO:initialize prev_reads for resetting.
         for i in range(self.num_heads):
             prev_read = torch.zeros([batch_size, self.memory.m])
+            nn.init.kaiming_uniform_(prev_read)
             self.prev_reads.append(prev_read)
 
     def forward(self, in_data):

@@ -80,8 +80,9 @@ for iter in tqdm(range(args.num_iters)):
     errors.append(error.item())
 
     # logging
-    if iter % 1000 == 0:
+    if iter % 200 == 0:
         print('Iteration: %d\tLoss: %.2f\tError in bits per sequence: %.2f' %
               (iter, np.mean(losses), np.mean(errors)))
+        # print(out, target)
         losses = []
         errors = []

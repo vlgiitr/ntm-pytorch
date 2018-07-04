@@ -9,8 +9,8 @@ class NTMMemory(nn.Module):
         self.n = memory_units
         self.m = memory_unit_size
         self.memory = torch.zeros([1, self.n, self.m])
-        self.register_buffer('mem_bias', torch.zeros([self.n, self.m]))
-        nn.init.kaiming_uniform_(self.mem_bias)
+        # self.register_buffer('mem_bias', torch.zeros([self.n, self.m]))
+        # nn.init.kaiming_uniform_(self.mem_bias)
         self.reset()
 
     def forward(self, *inputs):
@@ -103,7 +103,7 @@ class NTMMemory(nn.Module):
         self.memory = weights * data + (1 - weights) * self.memory
 
     def reset(self, batch_size=1):
-        # self.memory = torch.zeros([batch_size, self.n, self.m])
-        # nn.init.kaiming_uniform_(self.memory)
-        self.batch_size = batch_size
-        self.memory = self.mem_bias.clone().repeat(batch_size, 1, 1)
+        self.memory = torch.zeros([batch_size, self.n, self.m])
+        nn.init.kaiming_uniform_(self.memory)
+        # self.batch_size = batch_size
+        # self.memory = self.mem_bias.clone().repeat(batch_size, 1, 1)

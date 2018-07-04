@@ -39,12 +39,12 @@ class CopyDataset(Dataset):
 
         # fill in input sequence, two bit longer and wider than target
         # it is zero-padded upto maximum length after delimiter
-        input_seq = torch.zeros([self.max_seq_len + 2, self.seq_width + 2])
+        input_seq = torch.zeros([seq_len + 2, self.seq_width + 2])
         input_seq[0, self.seq_width] = 1.0  # start delimiter
         input_seq[1:seq_len + 1, :self.seq_width] = seq
         input_seq[seq_len + 1, self.seq_width + 1] = 1.0  # end delimiter
 
         # fill in and zero pad target sequence similarly
-        target_seq = torch.zeros([self.max_seq_len, self.seq_width])
+        target_seq = torch.zeros([seq_len, self.seq_width])
         target_seq[:seq_len, :self.seq_width] = seq
         return {'input': input_seq, 'target': target_seq}

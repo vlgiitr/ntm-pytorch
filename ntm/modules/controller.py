@@ -17,10 +17,10 @@ class NTMController(nn.Module):
         nn.init.xavier_uniform_(self.out_net.weight)
         self.h_state = torch.zeros([1, state_size])
         self.c_state = torch.zeros([1, state_size])
-        nn.init.kaiming_uniform_(self.h_state)
-        nn.init.kaiming_uniform_(self.c_state)
-        self.register_buffer('h_bias', torch.zeros([1, state_size]))
-        self.register_buffer('c_bias', torch.zeros([1, state_size]))
+        # nn.init.kaiming_uniform_(self.h_state)
+        # nn.init.kaiming_uniform_(self.c_state)
+        # self.register_buffer('h_bias', torch.zeros([1, state_size]))
+        # self.register_buffer('c_bias', torch.zeros([1, state_size]))
         self.reset()
 
     def forward(self, in_data, prev_reads):
@@ -35,9 +35,9 @@ class NTMController(nn.Module):
         return output
 
     def reset(self, batch_size=1):
-        # self.h_state = torch.zeros([batch_size, self.state_size])
-        # self.c_state = torch.zeros([batch_size, self.state_size])
-        # nn.init.kaiming_uniform_(self.h_state)
-        # nn.init.kaiming_uniform_(self.c_state)
-        self.h_state = self.h_bias.clone().repeat(batch_size, 1)
-        self.c_state = self.c_bias.clone().repeat(batch_size, 1)
+        self.h_state = torch.zeros([batch_size, self.state_size])
+        self.c_state = torch.zeros([batch_size, self.state_size])
+        nn.init.kaiming_uniform_(self.h_state)
+        nn.init.kaiming_uniform_(self.c_state)
+        # self.h_state = self.h_bias.clone().repeat(batch_size, 1)
+        # self.c_state = self.c_bias.clone().repeat(batch_size, 1)
