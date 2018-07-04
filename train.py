@@ -1,4 +1,6 @@
 import json
+from tqdm import tqdm
+import numpy as np
 
 import torch
 from torch import nn, optim
@@ -37,7 +39,9 @@ optimizer = optim.RMSprop(ntm.parameters(),
 # -- basic training loop
 # ----------------------------------------------------------------------------
 
-for iter in range(args.num_iters):
+losses = []
+errors = []
+for iter in tqdm(range(args.num_iters)):
     optimizer.zero_grad()
     ntm.reset()
 
@@ -61,6 +65,7 @@ for iter in range(args.num_iters):
     # print(target)
 
     loss = criterion(out, target)
+    losses.append(loss.item())
     loss.backward()
     # clips gradient in the range [-10,10]. Again there is a slight but
     # insignificant deviation from the paper where they are clipped to (-10,10)
@@ -68,12 +73,15 @@ for iter in range(args.num_iters):
     optimizer.step()
 
     binary_output = out.clone()
-    binary_output.apply_(lambda x: 0 if x < 0.5 else 1)
+    binary_output = binary_output.detach().apply_(lambda x: 0 if x < 0.5 else 1)
 
     # sequence prediction error is calculted in bits per sequence
     error = torch.sum(torch.abs(binary_output - target))
+    errors.append(error.item())
 
     # logging
     if iter % 1000 == 0:
         print('Iteration: %d\tLoss: %.2f\tError in bits per sequence: %.2f' %
-              (iter, loss, error))
+              (iter, np.mean(losses), np.mean(errors)))
+        losses = []
+        errors = []

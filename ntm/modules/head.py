@@ -21,6 +21,7 @@ class NTMHead(nn.Module):
         self.sharpen_factor_fc = nn.Linear(controller_size, 1)
         # fc layer to produce write data. data vector length=key_size
         self.write_data_fc = nn.Linear(controller_size, key_size)
+        self.reset()
 
     def forward(self, controller_state, prev_weights, memory, data=None):
         """Accept previous state (weights and memory) and controller state,
@@ -62,12 +63,12 @@ class NTMHead(nn.Module):
 
         # all these are marked as "controller outputs" in Figure 2
         key = self.key_fc(controller_state)
-        b = self.key_strength_fc(controller_state)
-        g = self.interpolation_gate_fc(controller_state)
-        s = self.shift_weighting_fc(controller_state)
+        b = F.softplus(self.key_strength_fc(controller_state))
+        g = F.sigmoid(self.interpolation_gate_fc(controller_state))
+        s = F.softmax(self.shift_weighting_fc(controller_state))
         # here the sharpening factor is less than 1 whereas as required in the
         # paper it should be greater than 1. hence adding 1.
-        y = 1 + self.sharpen_factor_fc(controller_state)
+        y = 1 + F.softplus(self.sharpen_factor_fc(controller_state))
         a = self.write_data_fc(controller_state)  # add vector
 
         content_weights = memory.content_addressing(key, b)
@@ -77,12 +78,12 @@ class NTMHead(nn.Module):
         shifted_weights = self._circular_conv1d(interpolated_weights, s)
         # the softmax introduces the exp of the argument which isn't there in
         # the paper. there it's just a simple normalization of the arguments.
-        # current_weights = shifted_weights ** y
-        print(shifted_weights)
-        current_weights = F.softmax(shifted_weights ** y)
-        print(current_weights)
-        # current_weights = torch.div(current_weights, torch.sum(
-        #     current_weights, dim=1).view(-1, 1) + 1e-16)
+        current_weights = shifted_weights ** y
+        # print(shifted_weights)
+        # current_weights = F.softmax(shifted_weights ** y)
+        # print(current_weights)
+        current_weights = torch.div(current_weights, torch.sum(
+            current_weights, dim=1).view(-1, 1) + 1e-16)
         # print(current_weights)
 
         if self.mode == 'r':
@@ -106,3 +107,17 @@ class NTMHead(nn.Module):
                               weights.view(batch_size, 1, -1))
         out_tensor = out_tensor.view(batch_size, -1)
         return out_tensor
+
+    def reset(self):
+        nn.init.xavier_uniform_(self.key_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.key_strength_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.interpolation_gate_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.shift_weighting_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.sharpen_factor_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.write_data_fc.weight, gain=1.4)
+        nn.init.normal_(self.key_fc.bias, std=0.01)
+        nn.init.normal_(self.key_strength_fc.bias, std=0.01)
+        nn.init.normal_(self.interpolation_gate_fc.bias, std=0.01)
+        nn.init.normal_(self.shift_weighting_fc.bias, std=0.01)
+        nn.init.normal_(self.sharpen_factor_fc.bias, std=0.01)
+        nn.init.normal_(self.write_data_fc.bias, std=0.01)
