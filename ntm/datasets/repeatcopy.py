@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from torch.utils.data import Dataset
 from torch.distributions.binomial import Binomial
 
@@ -6,43 +7,35 @@ from torch.distributions.binomial import Binomial
 class RepeatCopyDataset(Dataset):
     """A Dataset class to generate random examples for the repeat copy task.
     Each sequence has a random length between `min_seq_len` and `max_seq_len`.
-    Each vector in the sequence has a fixed length of `seq_width`. The last
-    vector is a delimeter flag denoting end of sequence.
+    Each vector in the sequence has a fixed length of `seq_width`. The input
+    sequence is prefixed by a start delimiter.
 
-    Along with a delimiter flag, the input sequence also contains a channel
+    Along with the delimiter flag, the input sequence also contains a channel
     for number of repetitions. The input representing the repeat number is
     normalised to have mean zero and variance one.
 
     For the target sequence, each sequence is repeated given number of times
-    followed by a delimiter flag.
+    followed by a delimiter flag marking end of the target sequence.
     """
 
-    def __init__(self, seq_width=8, min_seq_len=1, max_seq_len=10, min_repeat=1, max_repeat=10):
+    def __init__(self, task_params):
         """Initialize a dataset instance for repeat copy task.
 
         Arguments
         ---------
-        seq_width : int, optional
-            Width of the target sequence.
-        min_seq_len : int, optional
-            Minimum length of the target sequence.
-        max_seq_len : int, optional
-            Maximum length of the target sequence.
-        min_repeat : int, optional
-            Minimum number of repetitions.
-        max_repeat : int, optional
-            Maximum number of repetitions.
+        task_params : dict
+            A dict containing parameters relevant to repeat copy task.
         """
-        self.seq_width = seq_width
-        self.min_seq_len = min_seq_len
-        self.max_seq_len = max_seq_len
-        self.min_repeat = min_repeat
-        self.max_repeat = max_repeat
+        self.seq_width = task_params["seq_width"]
+        self.min_seq_len = task_params["min_seq_len"]
+        self.max_seq_len = task_params["max_seq_len"]
+        self.min_repeat = task_params["min_repeat"]
+        self.max_repeat = task_params["max_repeat"]
 
     def normalise(self, rep):
         rep_mean = (self.max_repeat - self.min_repeat) / 2
-        rep_var = (((self.max_repeat - self.repeat_min + 1) ** 2) - 1) / 12
-        rep_std = torch.sqrt(rep_var)
+        rep_var = (((self.max_repeat - self.min_repeat + 1) ** 2) - 1) / 12
+        rep_std = np.sqrt(rep_var)
         return (rep - rep_mean) / rep_std
 
     def __len__(self):
@@ -59,17 +52,14 @@ class RepeatCopyDataset(Dataset):
         prob = 0.5 * torch.ones([seq_len, self.seq_width], dtype=torch.float64)
         seq = Binomial(1, prob).sample()
 
-        # fill in input sequence, one bit longer and wider than target
-        # it is zero-padded upto maximum length after delimiter
-        input_seq = torch.zeros([self.seq_len + 2, self.seq_width + 2])
-        input_seq[:seq_len, :self.seq_width] = seq
-        input_seq[seq_len, self.seq_width] = 1.0  # delimiter
+        # fill in input sequence, two bit longer and wider than target
+        input_seq = torch.zeros([seq_len + 2, self.seq_width + 2])
+        input_seq[0, self.seq_width] = 1.0  # delimiter
+        input_seq[1:seq_len + 1, :self.seq_width] = seq
         input_seq[seq_len + 1, self.seq_width + 1] = self.normalise(rep)
 
-        # Fill in similarly and zero-pad upto maximum possible length for
-        # target sequence(max_seq_len*max_repeat) after delimiter.
         target_seq = torch.zeros(
-            [self.seq_len * self.rep + 1, self.seq_width + 1])
+            [seq_len * rep + 1, self.seq_width + 1])
         target_seq[:seq_len * rep, :self.seq_width] = seq.repeat(rep, 1)
         target_seq[seq_len * rep, self.seq_width] = 1.0  # delimiter
 

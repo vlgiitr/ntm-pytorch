@@ -1,0 +1,10 @@
+{
+	"task": "prioritysort",
+	"controller_size": 200,
+	"memory_units": 128,
+	"memory_unit_size": 20,
+	"num_heads": 5,
+	"seq_width": 8,
+	"input_seq_len": 20,
+	"target_seq_len": 16
+}

@@ -1,0 +1,12 @@
+{
+	"task": "repeatcopy",
+	"controller_size": 100,
+	"memory_units": 128,
+	"memory_unit_size": 20,
+	"num_heads": 1,
+	"seq_width": 8,
+	"min_seq_len": 1,
+	"max_seq_len": 10,
+	"min_repeat": 1,
+	"max_repeat": 10
+}

@@ -6,7 +6,7 @@ import torch
 from torch import nn, optim
 
 from ntm import NTM
-from ntm.datasets import CopyDataset
+from ntm.datasets import CopyDataset, RepeatCopyDataset, AssociativeDataset
 from ntm.args import get_parser
 
 
@@ -17,8 +17,10 @@ args = get_parser().parse_args()
 # ----------------------------------------------------------------------------
 
 # changed task_json in args.py  from tasks/copy.py to ntm/tasks/copy.py
+args.task_json = 'ntm/tasks/associative.json'
 task_params = json.load(open(args.task_json))
-dataset = CopyDataset(task_params)
+# dataset = CopyDataset(task_params)
+dataset = AssociativeDataset(task_params)
 
 ntm = NTM(input_size=task_params['seq_width'] + 2,
           output_size=task_params['seq_width'],

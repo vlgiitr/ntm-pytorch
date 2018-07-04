@@ -109,12 +109,20 @@ class NTMHead(nn.Module):
         return out_tensor
 
     def reset(self):
-        nn.init.xavier_uniform_(self.key_fc.weight, gain=1.4)
-        nn.init.xavier_uniform_(self.key_strength_fc.weight, gain=1.4)
-        nn.init.xavier_uniform_(self.interpolation_gate_fc.weight, gain=1.4)
-        nn.init.xavier_uniform_(self.shift_weighting_fc.weight, gain=1.4)
-        nn.init.xavier_uniform_(self.sharpen_factor_fc.weight, gain=1.4)
-        nn.init.xavier_uniform_(self.write_data_fc.weight, gain=1.4)
+        # nn.init.xavier_uniform_(self.key_fc.weight, gain=1.4)
+        # nn.init.xavier_uniform_(self.key_strength_fc.weight, gain=1.4)
+        # nn.init.xavier_uniform_(self.interpolation_gate_fc.weight, gain=1.4)
+        # nn.init.xavier_uniform_(self.shift_weighting_fc.weight, gain=1.4)
+        # nn.init.xavier_uniform_(self.sharpen_factor_fc.weight, gain=1.4)
+        # nn.init.xavier_uniform_(self.write_data_fc.weight, gain=1.4)
+
+        nn.init.kaiming_uniform_(self.key_fc.weight)
+        nn.init.kaiming_uniform_(self.key_strength_fc.weight)
+        nn.init.kaiming_uniform_(self.interpolation_gate_fc.weight)
+        nn.init.kaiming_uniform_(self.shift_weighting_fc.weight)
+        nn.init.kaiming_uniform_(self.sharpen_factor_fc.weight)
+        nn.init.kaiming_uniform_(self.write_data_fc.weight)
+
         nn.init.normal_(self.key_fc.bias, std=0.01)
         nn.init.normal_(self.key_strength_fc.bias, std=0.01)
         nn.init.normal_(self.interpolation_gate_fc.bias, std=0.01)

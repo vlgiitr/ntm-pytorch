@@ -14,7 +14,8 @@ class NTMController(nn.Module):
 
         self.controller_net = nn.LSTMCell(input_size, state_size)
         self.out_net = nn.Linear(read_data_size, output_size)
-        nn.init.xavier_uniform_(self.out_net.weight)
+        # nn.init.xavier_uniform_(self.out_net.weight)
+        nn.init.kaiming_uniform_(self.out_net.weight)
         self.h_state = torch.zeros([1, state_size])
         self.c_state = torch.zeros([1, state_size])
         # nn.init.kaiming_uniform_(self.h_state)

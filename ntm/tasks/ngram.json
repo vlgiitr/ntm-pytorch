@@ -1,0 +1,9 @@
+{
+	"task": "ngram",
+	"controller_size": 100,
+	"memory_units": 128,
+	"memory_unit_size": 20,
+	"num_heads": 1,
+	"seq_len": 200,
+	"N": 6
+}
