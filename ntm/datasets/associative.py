@@ -50,6 +50,7 @@ class AssociativeDataset(Dataset):
                         * (i + 1), :self.seq_width] = seq.sample()
 
         # generate query item randomly
+        # in case of only one item, torch.randint throws error as num_item-1=0
         query_item = 0
         if num_item != 1:
             query_item = torch.randint(
@@ -60,7 +61,6 @@ class AssociativeDataset(Dataset):
                     self.seq_width + 1] = 1.0  # query delimiter
         input_items[(self.seq_len + 1) * num_item + 1:(self.seq_len + 1)
                     * (num_item + 1), :self.seq_width] = query_seq
-        # print(query_seq.size(), x.size())
         input_items[(self.seq_len + 1) * (num_item + 1),
                     self.seq_width + 1] = 1.0  # query delimiter
 

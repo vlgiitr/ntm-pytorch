@@ -1,27 +1,47 @@
 import json
 from tqdm import tqdm
 import numpy as np
+import os
 
 import torch
 from torch import nn, optim
 
 from ntm import NTM
-from ntm.datasets import CopyDataset, RepeatCopyDataset, AssociativeDataset
+from ntm.datasets import CopyDataset, RepeatCopyDataset, AssociativeDataset, NGram, PrioritySort
 from ntm.args import get_parser
 
 
 args = get_parser().parse_args()
 
 # ----------------------------------------------------------------------------
-# -- initialize dataset, model, criterion and optimizer
+# -- initialize datasets, model, criterion and optimizer
 # ----------------------------------------------------------------------------
 
-# changed task_json in args.py  from tasks/copy.py to ntm/tasks/copy.py
+args.task_json = 'ntm/tasks/copy.json'
+"""
+args.task_json = 'ntm/tasks/repeatcopy.json'
 args.task_json = 'ntm/tasks/associative.json'
-task_params = json.load(open(args.task_json))
-# dataset = CopyDataset(task_params)
-dataset = AssociativeDataset(task_params)
+args.task_json = 'ntm/tasks/ngram.json'
+args.task_json = 'ntm/tasks/prioritysort.json'
+"""
 
+task_params = json.load(open(args.task_json))
+
+dataset = CopyDataset(task_params)
+"""
+dataset = RepeatCopyDataset(task_params)
+dataset = AssociativeDataset(task_params)
+dataset = NGram(task_params)
+dataset = PrioritySort(task_params)
+"""
+
+"""
+For the Copy task, input_size: seq_width + 2, output_size: seq_width
+For the RepeatCopy task, input_size: seq_width + 2, output_size: seq_width + 1
+For the Associative task, input_size: seq_width + 2, output_size: seq_width
+For the NGram task, input_size: 1, output_size: 1
+For the Priority Sort task, input_size: seq_width + 1, output_size: seq_width
+"""
 ntm = NTM(input_size=task_params['seq_width'] + 2,
           output_size=task_params['seq_width'],
           controller_size=task_params['controller_size'],
@@ -29,39 +49,33 @@ ntm = NTM(input_size=task_params['seq_width'] + 2,
           memory_unit_size=task_params['memory_unit_size'],
           num_heads=task_params['num_heads'])
 
-#Use this command to load the whole model rather than just paramters
-#This works even when you don't initialise the model as it directly imports from the file.
-
-#ntm= torch.load('filename.pt')
-
 criterion = nn.BCELoss()
 # As the learning rate is task specific, the argument can be moved to json file
-# fixed typo RMSProp->RMSprop
 optimizer = optim.RMSprop(ntm.parameters(),
                           lr=args.lr,
                           alpha=args.alpha,
                           momentum=args.momentum)
 
+cur_dir = os.getcwd()
+PATH = os.path.join(cur_dir, 'saved_model.pt')
+
 # ----------------------------------------------------------------------------
 # -- basic training loop
 # ----------------------------------------------------------------------------
-#Load pre trained model parameters and optimizer
-#For this you have to initialise the model because it only saves and loads model parameters.
-
-#state= torch.load('filename.pt')
-#ntm.load_state_dict(state['state_dict'])
-#optimizer.load_state_dict(state['optimizer'])
-
 losses = []
 errors = []
 for iter in tqdm(range(args.num_iters)):
+# for iter in tqdm(range(50000)):
     optimizer.zero_grad()
     ntm.reset()
 
     data = dataset[iter]
     input, target = data['input'], data['target']
+    out = torch.zeros(target.size())
 
-    # for i in range(1):
+    # -------------------------------------------------------------------------
+    # loop for other tasks
+    # -------------------------------------------------------------------------
     for i in range(input.size()[0]):
         # to maintain consistency in dimensions as torch.cat was throwing error
         in_data = torch.unsqueeze(input[i], 0)
@@ -69,13 +83,20 @@ for iter in tqdm(range(args.num_iters)):
 
     # passing zero vector as the input while generating target sequence
     in_data = torch.unsqueeze(torch.zeros(input.size()[1]), 0)
-    out = torch.zeros(target.size())
-    # for i in range(1):
     for i in range(target.size()[0]):
         out[i] = ntm(in_data)
-        # out = ntm(in_data)
-    # print(out)
-    # print(target)
+    # -------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # loop for NGram task
+    # -------------------------------------------------------------------------
+    """
+    for i in range(task_params['seq_len'] - 1):
+        in_data = input[i].view(1, -1)
+        ntm(in_data)
+        target_data = torch.zeros([1]).view(1, -1)
+        out[i] = ntm(target_data)
+    """
+    # -------------------------------------------------------------------------
 
     loss = criterion(out, target)
     losses.append(loss.item())
@@ -92,25 +113,10 @@ for iter in tqdm(range(args.num_iters)):
     error = torch.sum(torch.abs(binary_output - target))
     errors.append(error.item())
 
-    # logging
+    # ---logging---
     if iter % 200 == 0:
         print('Iteration: %d\tLoss: %.2f\tError in bits per sequence: %.2f' %
               (iter, np.mean(losses), np.mean(errors)))
-        # print(out, target)
-	#Save checkpoint for saving model parameters and 
-        #Command to save model parameters as a .pt file.
-
-        #state = {
-        #'epoch': iter,
-        #'state_dict': ntm.state_dict(),
-        #'optimizer': optimizer.state_dict(),
-        #}
-
-        #torch.save(state,'filename.pt')
-        
-        #Command to save the whole model at once along with all parameters.
-        #torch.save(ntm,'filename.pt')
-
         losses = []
         errors = []
 #-------------------------

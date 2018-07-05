@@ -99,8 +99,6 @@ class NTMHead(nn.Module):
         # pad left with elements from right, and vice-versa
         batch_size = weights.size(0)
         pad = int((weights.size(1) - 1) / 2)
-        # changed [pad:] to [:pad] and dimension of concatnation. earlier
-        # we had forgotten batch_size i.e. 0 dimension
         in_tensor = torch.cat(
             [in_tensor[:, -pad:], in_tensor, in_tensor[:, :pad]], dim=1)
         out_tensor = F.conv1d(in_tensor.view(batch_size, 1, -1),
@@ -110,18 +108,18 @@ class NTMHead(nn.Module):
 
     def reset(self):
         # nn.init.xavier_uniform_(self.key_fc.weight, gain=1.4)
-        # nn.init.xavier_uniform_(self.key_strength_fc.weight, gain=1.4)
-        # nn.init.xavier_uniform_(self.interpolation_gate_fc.weight, gain=1.4)
-        # nn.init.xavier_uniform_(self.shift_weighting_fc.weight, gain=1.4)
-        # nn.init.xavier_uniform_(self.sharpen_factor_fc.weight, gain=1.4)
-        # nn.init.xavier_uniform_(self.write_data_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.key_strength_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.interpolation_gate_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.shift_weighting_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.sharpen_factor_fc.weight, gain=1.4)
+        nn.init.xavier_uniform_(self.write_data_fc.weight, gain=1.4)
 
-        nn.init.kaiming_uniform_(self.key_fc.weight)
-        nn.init.kaiming_uniform_(self.key_strength_fc.weight)
-        nn.init.kaiming_uniform_(self.interpolation_gate_fc.weight)
-        nn.init.kaiming_uniform_(self.shift_weighting_fc.weight)
-        nn.init.kaiming_uniform_(self.sharpen_factor_fc.weight)
-        nn.init.kaiming_uniform_(self.write_data_fc.weight)
+        # nn.init.kaiming_uniform_(self.key_fc.weight)
+        # nn.init.kaiming_uniform_(self.key_strength_fc.weight)
+        # nn.init.kaiming_uniform_(self.interpolation_gate_fc.weight)
+        # nn.init.kaiming_uniform_(self.shift_weighting_fc.weight)
+        # nn.init.kaiming_uniform_(self.sharpen_factor_fc.weight)
+        # nn.init.kaiming_uniform_(self.write_data_fc.weight)
 
         nn.init.normal_(self.key_fc.bias, std=0.01)
         nn.init.normal_(self.key_strength_fc.bias, std=0.01)

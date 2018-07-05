@@ -42,16 +42,16 @@ class NGram(Dataset):
         # generate probabilities for the lookup table. The key represents the
         # possible binary sequences.
         for i in range(2**(self.n - 1)):
-            lookup_table[bin(i)[2:].rjust(self.n, '0')] = beta_prob.sample()
+            lookup_table[bin(i)[2:].rjust(self.n - 1, '0')] = beta_prob.sample()
 
         # generate input sequence
         input_seq = torch.zeros([self.seq_len])
         prob = Bernoulli(torch.tensor([0.5]))
         for i in range(self.n):
             input_seq[i] = prob.sample()
-        for i in range(self.n, self.seq_len):
-            prev = input_seq[i - self.n:i]
-            prev = ''.join(map(str,map(int,prev)))
+        for i in range(self.n - 1, self.seq_len):
+            prev = input_seq[i - self.n + 1:i]
+            prev = ''.join(map(str, map(int, prev)))
             prob = lookup_table[prev]
             input_seq[i] = Bernoulli(prob).sample()
 

@@ -9,6 +9,9 @@ class NTMMemory(nn.Module):
         self.n = memory_units
         self.m = memory_unit_size
         self.memory = torch.zeros([1, self.n, self.m])
+        nn.init.kaiming_uniform_(self.memory)
+        self.memory_bias_fc = nn.Linear(1, self.n*self.m)
+        # nn.init.xavier_uniform_(self.memory_bias_fc.weight)
         # self.register_buffer('mem_bias', torch.zeros([self.n, self.m]))
         # nn.init.kaiming_uniform_(self.mem_bias)
         self.reset()
@@ -72,8 +75,6 @@ class NTMMemory(nn.Module):
         # expand and perform batch matrix mutliplication
         weights = weights.view(-1, 1, self.n)
         # (b, 1, self.n) x (b, self.n, self.m) -> (b, 1, self.m)
-        # changing .squeeze to .view to consider cases where batch_size might
-        # be one.
         data = torch.bmm(weights, self.memory).view(-1, self.m)
         return data
 
@@ -103,7 +104,10 @@ class NTMMemory(nn.Module):
         self.memory = weights * data + (1 - weights) * self.memory
 
     def reset(self, batch_size=1):
-        self.memory = torch.zeros([batch_size, self.n, self.m])
-        nn.init.kaiming_uniform_(self.memory)
+        # self.memory = torch.zeros([batch_size, self.n, self.m])
+        # nn.init.kaiming_uniform_(self.memory)
+        in_data = torch.tensor([[0.]])  # dummy input
+        memory_bias = F.sigmoid(self.memory_bias_fc(in_data))
+        self.memory = memory_bias.view(self.n, self.m).repeat(batch_size, 1, 1)
         # self.batch_size = batch_size
         # self.memory = self.mem_bias.clone().repeat(batch_size, 1, 1)
