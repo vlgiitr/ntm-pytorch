@@ -2,9 +2,11 @@ import json
 from tqdm import tqdm
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 import torch
 from torch import nn, optim
+from tensorboard_logger import configure, log_value
 
 from ntm import NTM
 from ntm.datasets import CopyDataset, RepeatCopyDataset, AssociativeDataset, NGram, PrioritySort
@@ -12,6 +14,8 @@ from ntm.args import get_parser
 
 
 args = get_parser().parse_args()
+
+configure("runs/")
 
 # ----------------------------------------------------------------------------
 # -- initialize datasets, model, criterion and optimizer
@@ -117,6 +121,8 @@ for iter in tqdm(range(args.num_iters)):
     if iter % 200 == 0:
         print('Iteration: %d\tLoss: %.2f\tError in bits per sequence: %.2f' %
               (iter, np.mean(losses), np.mean(errors)))
+        log_value('train_loss', np.mean(losses), iter)
+        log_value('bit_error_per_sequence', np.mean(errors), iter)
         losses = []
         errors = []
 #-------------------------
