@@ -22,8 +22,8 @@ dataset = CopyDataset(task_params)
 
 cur_dir = os.getcwd()
 PATH = os.path.join(cur_dir, 'saved_model.pt')
-ntm = torch.load(PATH)
-"""
+# ntm = torch.load(PATH)
+
 ntm = NTM(input_size=task_params['seq_width'] + 2,
           output_size=task_params['seq_width'],
           controller_size=task_params['controller_size'],
@@ -32,7 +32,7 @@ ntm = NTM(input_size=task_params['seq_width'] + 2,
           num_heads=task_params['num_heads'])
 
 ntm.load_state_dict(torch.load(PATH))
-"""
+
 
 # -----------------------------------------------------------------------------
 # --- evaluation loop
@@ -40,6 +40,7 @@ ntm.load_state_dict(torch.load(PATH))
 losses = []
 errors = []
 for iter in tqdm(range(1000)):
+    ntm.reset()
     data = dataset[iter]
     input, target = data['input'], data['target']
     out = torch.zeros(target.size())

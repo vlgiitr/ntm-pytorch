@@ -158,3 +158,7 @@ for idx in range(args.num_iters):
 	if (idx % 1000 == 0):
 		print(f'Iteration: {idx}, Loss:{loss.data[0]:.2f}, Cost: {cost:.2f}')
 
+# ---saving the model---
+torch.save(ntm.stat_dict(), PATH)
+# torch.save(ntm, PATH)
+
