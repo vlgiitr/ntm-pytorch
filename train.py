@@ -59,7 +59,11 @@ optimizer = optim.RMSprop(ntm.parameters(),
                           lr=args.lr,
                           alpha=args.alpha,
                           momentum=args.momentum)
-
+'''
+optimizer= optim.Adam(ntm.parameters(),
+		lr=args.lr,
+		betas=(args.beta1,args.beta2))
+'''
 cur_dir = os.getcwd()
 PATH = os.path.join(cur_dir, 'saved_model.pt')
 
