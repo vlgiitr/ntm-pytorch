@@ -18,16 +18,11 @@ class NTMController(nn.Module):
         nn.init.kaiming_uniform_(self.out_net.weight)
         self.h_state = torch.zeros([1, controller_size])
         self.c_state = torch.zeros([1, controller_size])
+        # layers to learn bias values for controller state reset
         self.h_bias_fc = nn.Linear(1, controller_size)
         # nn.init.kaiming_uniform_(self.h_bias_fc.weight)
         self.c_bias_fc = nn.Linear(1, controller_size)
         # nn.init.kaiming_uniform_(self.c_bias_fc.weight)
-        # nn.init.kaiming_uniform_(self.h_state)
-        # nn.init.kaiming_uniform_(self.c_state)
-        # self.register_buffer('h_bias', torch.zeros([1, controller_size]))
-        # self.register_buffer('c_bias', torch.zeros([1, controller_size]))
-        # nn.init.kaiming_uniform_(self.h_bias)
-        # nn.init.kaiming_uniform_(self.c_bias)
         self.reset()
 
     def forward(self, in_data, prev_reads):
@@ -42,14 +37,8 @@ class NTMController(nn.Module):
         return output
 
     def reset(self, batch_size=1):
-        # self.h_state = torch.zeros([batch_size, self.controller_size])
-        # self.c_state = torch.zeros([batch_size, self.controller_size])
-        # nn.init.kaiming_uniform_(self.h_state)
-        # nn.init.kaiming_uniform_(self.c_state)
         in_data = torch.tensor([[0.]])  # dummy input
         h_bias = self.h_bias_fc(in_data)
         self.h_state = h_bias.repeat(batch_size, 1)
         c_bias = self.c_bias_fc(in_data)
         self.c_state = c_bias.repeat(batch_size, 1)
-        # self.h_state = self.h_bias.clone().repeat(batch_size, 1)
-        # self.c_state = self.c_bias.clone().repeat(batch_size, 1)

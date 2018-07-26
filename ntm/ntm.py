@@ -48,16 +48,15 @@ class NTM(nn.Module):
             prev_weight = torch.zeros([batch_size, self.memory.n])
             self.prev_head_weights.append(prev_weight)
         self.prev_reads = []
-        # TODO:initialize prev_reads for resetting.
         for i in range(self.num_heads):
             prev_read = torch.zeros([batch_size, self.memory.m])
+            # using random initialization for previous reads
             nn.init.kaiming_uniform_(prev_read)
             self.prev_reads.append(prev_read)
 
     def forward(self, in_data):
         controller_h_state, controller_c_state = self.controller(
             in_data, self.prev_reads)
-        # print(controller_h_state, controller_c_state)
         read_data = []
         head_weights = []
         for head, prev_head_weight in zip(self.heads, self.prev_head_weights):

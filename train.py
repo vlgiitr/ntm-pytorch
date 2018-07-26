@@ -2,7 +2,6 @@ import json
 from tqdm import tqdm
 import numpy as np
 import os
-import matplotlib.pyplot as plt
 
 import torch
 from torch import nn, optim
@@ -22,22 +21,22 @@ configure("runs/")
 # ----------------------------------------------------------------------------
 
 args.task_json = 'ntm/tasks/copy.json'
-"""
+'''
 args.task_json = 'ntm/tasks/repeatcopy.json'
 args.task_json = 'ntm/tasks/associative.json'
 args.task_json = 'ntm/tasks/ngram.json'
 args.task_json = 'ntm/tasks/prioritysort.json'
-"""
+'''
 
 task_params = json.load(open(args.task_json))
 
 dataset = CopyDataset(task_params)
-"""
+'''
 dataset = RepeatCopyDataset(task_params)
 dataset = AssociativeDataset(task_params)
 dataset = NGram(task_params)
 dataset = PrioritySort(task_params)
-"""
+'''
 
 """
 For the Copy task, input_size: seq_width + 2, output_size: seq_width
@@ -60,12 +59,20 @@ optimizer = optim.RMSprop(ntm.parameters(),
                           alpha=args.alpha,
                           momentum=args.momentum)
 '''
-optimizer= optim.Adam(ntm.parameters(),
-		lr=args.lr,
-		betas=(args.beta1,args.beta2))
+optimizer = optim.Adam(ntm.parameters(), lr=args.lr,
+                       betas=(args.beta1, args.beta2))
 '''
+
+args.saved_model = 'saved_model_copy.pt'
+'''
+args.saved_model = 'saved_model_repeatcopy.pt'
+args.saved_model = 'saved_model_associative.pt'
+args.saved_model = 'saved_model_ngram.pt'
+args.saved_model = 'saved_model_prioritysort.pt'
+'''
+
 cur_dir = os.getcwd()
-PATH = os.path.join(cur_dir, 'saved_model.pt')
+PATH = os.path.join(cur_dir, args.saved_model)
 
 # ----------------------------------------------------------------------------
 # -- basic training loop
@@ -73,7 +80,6 @@ PATH = os.path.join(cur_dir, 'saved_model.pt')
 losses = []
 errors = []
 for iter in tqdm(range(args.num_iters)):
-# for iter in tqdm(range(50000)):
     optimizer.zero_grad()
     ntm.reset()
 
@@ -89,7 +95,7 @@ for iter in tqdm(range(args.num_iters)):
         in_data = torch.unsqueeze(input[i], 0)
         ntm(in_data)
 
-    # passing zero vector as the input while generating target sequence
+    # passing zero vector as input while generating target sequence
     in_data = torch.unsqueeze(torch.zeros(input.size()[1]), 0)
     for i in range(target.size()[0]):
         out[i] = ntm(in_data)
@@ -97,13 +103,13 @@ for iter in tqdm(range(args.num_iters)):
     # -------------------------------------------------------------------------
     # loop for NGram task
     # -------------------------------------------------------------------------
-    """
+    '''
     for i in range(task_params['seq_len'] - 1):
         in_data = input[i].view(1, -1)
         ntm(in_data)
         target_data = torch.zeros([1]).view(1, -1)
         out[i] = ntm(target_data)
-    """
+    '''
     # -------------------------------------------------------------------------
 
     loss = criterion(out, target)
@@ -163,6 +169,6 @@ for idx in range(args.num_iters):
 		print(f'Iteration: {idx}, Loss:{loss.data[0]:.2f}, Cost: {cost:.2f}')
 
 # ---saving the model---
-torch.save(ntm.stat_dict(), PATH)
+torch.save(ntm.state_dict(), PATH)
 # torch.save(ntm, PATH)
 
