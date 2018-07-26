@@ -22,6 +22,7 @@ pip install numpy
 pip install tensorboard_logger
 pip install matplotlib
 pip install tqdm
+pip install Pillow
 ```
 
 Training
@@ -54,7 +55,7 @@ We have integrated Tensorboard_logger to visualize training and evaluation loss 
 ```
 pip install tensorboard_logger
 ```
-Visualization code for bitmao
+Visualization code for bitmap
 Results
 ===============================
 Results for all tasks are present in ```zip``` as tensorboard visualization files. 
@@ -62,7 +63,7 @@ To view the training loss curves and bits per sequence error curves, use command
 ```
 tensorboard --logdir zip
 ``` 
-Code for visualizing outputs has been provided in ```evaluate.py``` itself. Sample outputs have been provided in the ```results``` folder.
+Code for visualizing outputs has been provided in the jupyter notebook. Sample outputs have been provided in the ```images``` folder.
 
 Acknowledgements
 ===============================
