@@ -7,11 +7,6 @@ from .modules.memory import NTMMemory
 
 
 class NTM(nn.Module):
-    # TODO: To check output of the NTMClass. What all is needed as output.
-    # For the next time-step although we need prev_states but drawing analogy
-    # with the LSTMCell where we were updating h_state and c_state on the fly,
-    # have tried to do something similar here. To check whether it's correct.
-
     def __init__(self,
                  input_size,
                  output_size,

@@ -15,8 +15,8 @@ args.task_json = 'ntm/tasks/copy.json'
 '''
 args.task_json = 'ntm/tasks/repeatcopy.json'
 args.task_json = 'ntm/tasks/associative.json'
-args.task_json = 'ntm/tasks/prioritysort.json'
 args.task_json = 'ntm/tasks/ngram.json'
+args.task_json = 'ntm/tasks/prioritysort.json'
 '''
 
 task_params = json.load(open(args.task_json))
@@ -31,7 +31,6 @@ task_params['max_seq_len'] = 120
 # (Sequence length generalisation)
 task_params['min_seq_len'] = 10
 task_params['max_seq_len'] = 20
-"""
 # (Number of repetition generalisation)
 task_params['min_repeat'] = 10
 task_params['max_repeat'] = 20
@@ -61,6 +60,7 @@ args.saved_model = 'saved_model_prioritysort.pt'
 
 cur_dir = os.getcwd()
 PATH = os.path.join(cur_dir, args.saved_model)
+# PATH = os.path.join(cur_dir, 'saved_models/saved_model_copy_500000.pt')
 # ntm = torch.load(PATH)
 
 """
@@ -124,9 +124,5 @@ error = torch.sum(torch.abs(binary_output - target))
 # ---logging---
 print('Loss: %.2f\tError in bits per sequence: %.2f' % (loss, error))
 
-# -----------------------------------------------------------------------------
-# --- visualization
-# -----------------------------------------------------------------------------
-fig, (ax1, ax2) = plt.subplots(1, 2)
-ax1.imshow(torch.t(target), interpolation='nearest', cmap='gray')
-ax2.imshow(torch.t(binary_output), interpolation='nearest', cmap='gray')
+# ---saving results---
+result = {'output': binary_output, 'target': target}
