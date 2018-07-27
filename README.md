@@ -39,10 +39,18 @@ usage : train.py [-h] [-task_json TASK_JSON] [-batch_size BATCH_SIZE]
 ```
 Both RMSprop and Adam optimizers have been provided. ```-momentum``` and ```-alpha``` are parameters for RMSprop and ```-beta1``` and ```-beta2``` are parameters for Adam. All these arguments are initialized to their default values.
 
-- Training for copy task is carried out with sequence length ranging from 1-20.
-- Training for repeat copy task is carried out with sequence length ranging from 1-10 and repeat number in the range 1-10.
-- Training for associative recall task is carried out the number of items ranging from 2-6.
-- Training for priority sort task is carried outwith an input sequence length of 20 and target sequence length of 16.
+- Training for copy task is carried out with sequence length ranging from 1-20. The curve for bits per sequence error vs iterations for this task is shown below :
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/copy_loss.png)
+
+- Training for repeat copy task is carried out with sequence length ranging from 1-10 and repeat number in the range 1-10. The curve for bits per sequence error vs iterations for this task is shown below :
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/repeat_copy_loss.png)
+
+- Training for associative recall task is carried out the number of items ranging from 2-6.The curve for bits per sequence error vs iterations for this task is shown below :
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/associative_loss.png)
+
+- Training for priority sort task is carried outwith an input sequence length of 20 and target sequence length of 16. The curve for bits per sequence error vs iterations for this task is shown below :
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/prioritysort_loss.png)
+
 
 Evaluation
 ===============================
