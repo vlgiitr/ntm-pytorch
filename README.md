@@ -3,6 +3,7 @@ Neural Turing Machines (Pytorch)
 Code for the paper
 
 **[Neural Turing Machines][1]**
+
 Alex Graves, Greg Wayne, Ivo Danihelka
 
 [1]: https://arxiv.org/abs/1410.5401
@@ -107,7 +108,9 @@ Code for visualizing outputs has been provided in the jupyter notebook. Sample o
 Acknowledgements
 ===============================
 - This repository is based on **[Neural Turing Machines][1]** by DeepMind.
-- We have used the following codebase as a reference for our implementation : **[loudinthecloud/pytorch-ntm][2]**  [2]:https://github.com/loudinthecloud/pytorch-ntm
+- We have used the following codebase as a reference for our implementation : **[loudinthecloud/pytorch-ntm][2]**  
+
+[2]:https://github.com/loudinthecloud/pytorch-ntm
 
 LICENSE
 ===============================
