@@ -39,6 +39,11 @@ usage : train.py [-h] [-task_json TASK_JSON] [-batch_size BATCH_SIZE]
 ```
 Both RMSprop and Adam optimizers have been provided. ```-momentum``` and ```-alpha``` are parameters for RMSprop and ```-beta1``` and ```-beta2``` are parameters for Adam. All these arguments are initialized to their default values.
 
+- Training for copy task is carried out with sequence length ranging from 1-20.
+- Training for repeat copy task is carried out with sequence length ranging from 1-10 and repeat number in the range 1-10.
+- Training for associative recall task is carried out the number of items ranging from 2-6.
+- Training for priority sort task is carried outwith an input sequence length of 20 and target sequence length of 16.
+
 Evaluation
 ===============================
 The model was trained and was evaluated as mentioned in the paper. The results were in accordance with the paper. Saved models for all the tasks are available in the ```saved_models``` folder. The model for copy task has been trained upto 500k iterations and those for repeat copy, associative recall and priority sort have been trained upto 100k iterations. The code for saving and loading the model has been incorporated in ```train.py``` and ```evaluate.py``` respectively.
@@ -49,6 +54,12 @@ Evaluation can be done as follows :
 ```
 python evaluate.py
 ```
+- Results for copy task shows that the NTM generalizes well for sequence length upto 120.
+- Results for the repeat copy task shows that the NTM generalizes well for maximum sequence length of 20 and repeat number     upto 20.
+- Results for associative recall task shows that the NTM generalizes well for number of items upto 20.
+- Results for the priority sort task also show the better generalization capability of the NTM.
+
+
 Visualization
 ===============================
 We have integrated Tensorboard_logger to visualize training and evaluation loss and bits per sequence error. To install tensorboard logger use :
