@@ -39,6 +39,7 @@ usage : train.py [-h] [-task_json TASK_JSON] [-batch_size BATCH_SIZE]
 ```
 Both RMSprop and Adam optimizers have been provided. ```-momentum``` and ```-alpha``` are parameters for RMSprop and ```-beta1``` and ```-beta2``` are parameters for Adam. All these arguments are initialized to their default values.
 
+The smoothing factor for all curves is ```0.6```
 - Training for copy task is carried out with sequence length ranging from 1-20. The curve for bits per sequence error vs iterations for this task is shown below :
 ![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/copy_loss.png)
 
@@ -62,10 +63,17 @@ Evaluation can be done as follows :
 ```
 python evaluate.py
 ```
-- Results for copy task shows that the NTM generalizes well for sequence length upto 120.
-- Results for the repeat copy task shows that the NTM generalizes well for maximum sequence length of 20 and repeat number     upto 20.
-- Results for associative recall task shows that the NTM generalizes well for number of items upto 20.
-- Results for the priority sort task also show the better generalization capability of the NTM.
+- Results for copy task shows that the NTM generalizes well for sequence length upto 120. The input and output for copy task is shown below :
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/copy.png)
+
+- Results for the repeat copy task shows that the NTM generalizes well for maximum sequence length of 20 and repeat number     upto 20. The input and output for repeat copy task is shown below :
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/repeat_copy.png)
+
+- Results for associative recall task shows that the NTM generalizes well for number of items upto 20. The input and output for associative recall task is shown below :
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/associative.png)
+
+- Results for the priority sort task also show the better generalization capability of the NTM. The input and output for priority sort task is shown below :
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/prioritysort.png)
 
 
 Visualization
