@@ -19,8 +19,6 @@ def get_parser():
                         help='momentum for rmsprop optimizer')
     parser.add_argument('-alpha', type=float, default=0.95,
                         help='alpha for rmsprop optimizer')
-    parser.add_argument('-task', type=str, default='copy',
-                        help='name of task to save model')
     parser.add_argument('-beta1', type=float, default=0.9,
                         help='beta1 constant for adam optimizer')
     parser.add_argument('-beta2', type=float, default=0.999,
