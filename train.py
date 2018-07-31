@@ -135,40 +135,7 @@ for iter in tqdm(range(args.num_iters)):
         log_value('bit_error_per_sequence', np.mean(errors), iter)
         losses = []
         errors = []
-#-------------------------
-#-------------------------
-#-------------------------
-
-for idx in range(args.num_iters):
-	data = dataset[idx] # data is a dictionary returned by __getitem__ function
-	input, target = data['input'], data['target']
-
-	optimizer.zero_grad()
-	net.reset()
-	# Loop over the entire sequence length
-	for i in range(input.size()[0])
-		ntm(input[i])
-
-	out = Variable(torch.zeros(target.size()))
-
-	# No input is given while reading the output
-	for j in range(target.size()[0])
-		out[j] = ntm()
-
-	loss = criterion(out, target)
-	loss.backward()
-	optimizer.step()
-
-	out = out.clone().data
-	binary_out = out.apply_(lambda x: 1 if x > 0.5 else 0)
-
-	cost = torch.sum(torch.abs(binary_out - target))
-	
-
-	if (idx % 1000 == 0):
-		print(f'Iteration: {idx}, Loss:{loss.data[0]:.2f}, Cost: {cost:.2f}')
 
 # ---saving the model---
 torch.save(ntm.state_dict(), PATH)
 # torch.save(ntm, PATH)
-

@@ -14,6 +14,9 @@ This repository is a stable Pytorch implementation of a Neural Turing Machine an
 <p align="center">
 <img width="500" height="300" src="https://www.researchgate.net/profile/Gabriel_Makdah/publication/279864730/figure/fig3/AS:372237233344513@1465759680918/Neural-Turing-Machine-architecture-The-controller-or-neural-network-receives-the-input.png">
 </p>
+<p align="center">
+<em> Neural Turing Machine architecture </em>
+</p>
 
 Setup
 =================================
@@ -47,7 +50,7 @@ The script runs with all arguments set to default value. If you wish to changes 
 ```
 usage : train.py [-h] [-task_json TASK_JSON] [-batch_size BATCH_SIZE]
                 [-num_iters NUM_ITERS] [-lr LR] [-momentum MOMENTUM]
-                [-alpha ALPHA] [-task TASK] [-beta1 BETA1] [-beta2 BETA2]
+                [-alpha ALPHA] [-saved_model SAVED_MODEL] [-beta1 BETA1] [-beta2 BETA2]
 ```
 Both RMSprop and Adam optimizers have been provided. ```-momentum``` and ```-alpha``` are parameters for RMSprop and ```-beta1``` and ```-beta2``` are parameters for Adam. All these arguments are initialized to their default values.
 
