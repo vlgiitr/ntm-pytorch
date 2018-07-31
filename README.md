@@ -7,10 +7,13 @@ Code for the paper
 Alex Graves, Greg Wayne, Ivo Danihelka
 
 [1]: https://arxiv.org/abs/1410.5401
-NTMs are memory augmented neural networks which interacts with an external memory by attentional processes. It is end-to-end differentiable and thus is hypothesised at being able to learn simple algorithms. An NTM outperforms LSTM in learning several algorithmic tasks due to the presence of external memory without an increase in parameters and computation.
+Neural Turing Machines (NTMs) contain a recurrent network coupled with an external memory resource, which it can interact with by attentional processes. Therefore NTMs can be called Memory Augmented Neural Networks. They are end-to-end differentiable and thus are hypothesised at being able to learn simple algorithms. They outperform LSTMs in learning several algorithmic tasks due to the presence of external memory without an increase in parameters and computation.
 
 This repository is a stable Pytorch implementation of a Neural Turing Machine and contains the code for training, evaluating and visualizing results for the Copy, Repeat Copy, Associative Recall and Priority Sort tasks. The code has been tested for all 4 tasks and the results obtained are in accordance with the results mentioned in the paper. The training and evaluation code for N-Gram task has been provided however the results would be uploaded after testing.
-![Alt text](https://www.researchgate.net/profile/Gabriel_Makdah/publication/279864730/figure/fig3/AS:372237233344513@1465759680918/Neural-Turing-Machine-architecture-The-controller-or-neural-network-receives-the-input.png)
+
+<p align="center">
+<img width="500" height="300" src="https://www.researchgate.net/profile/Gabriel_Makdah/publication/279864730/figure/fig3/AS:372237233344513@1465759680918/Neural-Turing-Machine-architecture-The-controller-or-neural-network-receives-the-input.png">
+</p>
 
 Setup
 =================================
@@ -50,16 +53,16 @@ Both RMSprop and Adam optimizers have been provided. ```-momentum``` and ```-alp
 
 The smoothing factor for all curves is ```0.6```
 - Training for copy task is carried out with sequence length ranging from 1-20. The curve for bits per sequence error vs iterations for this task is shown below :
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/copy_loss.png)
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/copy_loss.png)
 
 - Training for repeat copy task is carried out with sequence length ranging from 1-10 and repeat number in the range 1-10. The curve for bits per sequence error vs iterations for this task is shown below :
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/repeat_copy_loss.png)
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/repeat_copy_loss.png)
 
 - Training for associative recall task is carried out the number of items ranging from 2-6.The curve for bits per sequence error vs iterations for this task is shown below :
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/associative_loss.png)
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/associative_loss.png)
 
 - Training for priority sort task is carried outwith an input sequence length of 20 and target sequence length of 16. The curve for bits per sequence error vs iterations for this task is shown below :
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/prioritysort_loss.png)
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/prioritysort_loss.png)
 
 
 Evaluation
@@ -74,19 +77,19 @@ python evaluate.py
 ```
 - Results for copy task shows that the NTM generalizes well for sequence length upto 120. The target and output for copy task is shown below :
 
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/copy_1.png)
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/copy_1.png)
 
 - Results for the repeat copy task shows that the NTM generalizes well for maximum sequence length of 20 and repeat number     upto 20. The target and output for repeat copy task is shown below :
 
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/repeat_copy_seq_len_1.png)
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/repeat_copy_seq_len_1.png)
 
 - Results for associative recall task shows that the NTM generalizes well for number of items upto 20. The target and output for associative recall task is shown below :
 
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/associative_2.png)
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/associative_2.png)
 
 - Results for the priority sort task also show the better generalization capability of the NTM. The target and output for priority sort task is shown below :
 
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/rep_copy_branch/images/priority_sort_1.png)
+![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/priority_sort_1.png)
 
 
 Visualization
@@ -95,19 +98,11 @@ We have integrated Tensorboard_logger to visualize training and evaluation loss 
 ```
 pip install tensorboard_logger
 ```
-Visualization code for bitmap
-Results
-===============================
-Results for all tasks are present in ```zip``` as tensorboard visualization files. 
-To view the training loss curves and bits per sequence error curves, use command :
-```
-tensorboard --logdir zip
-``` 
-Code for visualizing outputs has been provided in the jupyter notebook. Sample outputs have been provided in the ```images``` folder.
+
+Sample outputs and bits per sequence error curves have been provided in the ```images``` folder.
 
 Acknowledgements
 ===============================
-- This repository is based on **[Neural Turing Machines][1]** by DeepMind.
 - We have used the following codebase as a reference for our implementation : **[loudinthecloud/pytorch-ntm][2]**  
 
 [2]:https://github.com/loudinthecloud/pytorch-ntm
