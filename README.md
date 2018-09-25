@@ -56,16 +56,16 @@ Both RMSprop and Adam optimizers have been provided. ```-momentum``` and ```-alp
 
 The smoothing factor for all curves is ```0.6```
 - Training for copy task is carried out with sequence length ranging from 1-20. The curve for bits per sequence error vs iterations for this task is shown below :
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/copy_loss.png)
+![Alt text](https://github.com/vlgiitr/ntm-pytorch/blob/master/images/copy_loss.png)
 
 - Training for repeat copy task is carried out with sequence length ranging from 1-10 and repeat number in the range 1-10. The curve for bits per sequence error vs iterations for this task is shown below :
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/repeat_copy_loss.png)
+![Alt text](https://github.com/vlgiitr/ntm-pytorch/blob/master/images/repeat_copy_loss.png)
 
 - Training for associative recall task is carried out the number of items ranging from 2-6.The curve for bits per sequence error vs iterations for this task is shown below :
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/associative_loss.png)
+![Alt text](https://github.com/vlgiitr/ntm-pytorch/blob/master/images/associative_loss.png)
 
 - Training for priority sort task is carried outwith an input sequence length of 20 and target sequence length of 16. The curve for bits per sequence error vs iterations for this task is shown below :
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/prioritysort_loss.png)
+![Alt text](https://github.com/vlgiitr/ntm-pytorch/blob/master/images/prioritysort_loss.png)
 
 
 Evaluation
@@ -80,19 +80,19 @@ python evaluate.py
 ```
 - Results for copy task shows that the NTM generalizes well for sequence length upto 120. The target and output for copy task is shown below :
 
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/copy_1.png)
+![Alt text](https://github.com/vlgiitr/ntm-pytorch/blob/master/images/copy_1.png)
 
 - Results for the repeat copy task shows that the NTM generalizes well for maximum sequence length of 20 and repeat number     upto 20. The target and output for repeat copy task is shown below :
 
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/repeat_copy_seq_len_1.png)
+![Alt text](https://github.com/vlgiitr/ntm-pytorch/blob/master/images/repeat_copy_seq_len_1.png)
 
 - Results for associative recall task shows that the NTM generalizes well for number of items upto 20. The target and output for associative recall task is shown below :
 
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/associative_2.png)
+![Alt text](https://github.com/vlgiitr/ntm-pytorch/blob/master/images/associative_2.png)
 
 - Results for the priority sort task also show the better generalization capability of the NTM. The target and output for priority sort task is shown below :
 
-![Alt text](https://github.com/kdexd/ntm-pytorch/blob/master/images/priority_sort_1.png)
+![Alt text](https://github.com/vlgiitr/ntm-pytorch/blob/master/images/priority_sort_1.png)
 
 
 Visualization
